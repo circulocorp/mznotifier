@@ -14,8 +14,8 @@ phases:
     commands:
       - echo Build version $VERSION started on `date`
       - docker build -t mznotifier:$VERSION .
-      - docker tag circulocorp-sms:$VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mznotifier:$VERSION
-      - docker tag circulocorp-sms:$VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mznotifier:latest
+      - docker tag mznotifier:$VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mznotifier:$VERSION
+      - docker tag mznotifier:$VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/mznotifier:latest
   post_build:
     commands:
       - echo Build completed on `date`
