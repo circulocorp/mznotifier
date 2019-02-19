@@ -50,6 +50,7 @@ def address_helper(addresses, token):
 
 
 def send_to_rabbit(envelop):
+    logger.info("Posting data to RabbitMQ", extra={'props': {"app": config["name"], "label": config["name"]}})
     credentials = pika.PlainCredentials(rabbit_user, rabbit_pass)
     parameters = pika.ConnectionParameters(rabbitmq, 5672, '/', credentials)
     connection = pika.BlockingConnection(parameters)
@@ -83,8 +84,8 @@ def build_message(messages, addresses):
             envelops.append(enve)
 
     mq["data"] = envelops
-    logger.info("Posting message to RabbitMQ", extra={'props': {"message": mq,
-                                                          "app": config["name"], "label": config["name"]}})
+    logger.info("Posting message to RabbitMQ", extra={'props': {"message": json.dumps(mq), "app": config["name"],
+                                                                "label": config["name"]}})
     send_to_rabbit(mq)
     mark_read(messages)
 
