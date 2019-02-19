@@ -118,7 +118,7 @@ def main():
     print(Utils.print_title("package.json"))
     while True:
         start()
-        sleep(300)
+        sleep(120)
 
 
 if __name__ == '__main__':

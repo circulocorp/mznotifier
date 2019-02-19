@@ -1,11 +1,11 @@
 {
 	"name": "mznotifier",
-	"version": "0.0.1",
+	"version": "0.0.5",
 	"description": "MZone SMS notifications",
 	"author": "Mauricio Barrera",
 	"queue": "notificaciones",
 	"dev": {
-        "RABBITMQ_URL": "192.168.1.71",
+        "RABBITMQ_URL": "10.0.4.100",
 		"secrets": false,
         "rabbitmq_user": "admin",
         "rabbitmq_passw": "admin123",
