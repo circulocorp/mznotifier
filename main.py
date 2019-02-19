@@ -83,11 +83,15 @@ def build_message(messages, addresses):
             enve["address"] = phone
             envelops.append(enve)
 
-    mq["data"] = envelops
-    logger.info("Posting message to RabbitMQ", extra={'props': {"message": json.dumps(mq), "app": config["name"],
-                                                                "label": config["name"]}})
-    send_to_rabbit(mq)
-    mark_read(messages)
+    if len(envelops) > 0:
+        mq["data"] = envelops
+        logger.info("Posting message to RabbitMQ", extra={'props': {"message": json.dumps(mq), "app": config["name"],
+                                                                    "label": config["name"]}})
+        send_to_rabbit(mq)
+        mark_read(messages)
+    else:
+        logger.info("There is nothing to send to RabbitMQ", extra={'props': {"app": config["name"],
+                                                                             "label": config["name"]}})
 
 
 def start():
