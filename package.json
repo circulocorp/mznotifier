@@ -1,6 +1,6 @@
 {
 	"name": "mznotifier",
-	"version": "0.0.9",
+	"version": "0.1.0",
 	"description": "MZone SMS notifications",
 	"author": "Mauricio Barrera",
 	"queue": "notificaciones",
@@ -11,10 +11,14 @@
         "rabbitmq_passw": "admin123",
         "mzone_user": "ADMIN@0145",
         "mzone_pass": "A3TEKCC0145",
-        "mzone_secret": "WJ4wUJo79qFsMm4T9Rj7dKw4"
+        "mzone_secret": "WJ4wUJo79qFsMm4T9Rj7dKw4",
+        "mzone_users": ["jesus.hernandez", "ADMIN@0145"],
+        "mzone_passwords": ["JHernandez1", "A3TEKCC0145"]
     },
     "stage": {
-        "RABBITMQ_URL": "192.168.1.71",
+        "RABBITMQ_URL": "10.0.4.100",
+        "mzone_users": ["Julioc", "jesus.hernandez", "ADMIN@0145"],
+        "mzone_passwords": ["Jc061978", "JHernandez1", "A3TEKCC0145"],
 		"secrets": true
     },
 	"prod": {

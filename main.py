@@ -1,6 +1,8 @@
 from PydoNovosoft.utils import Utils
 from PydoNovosoft.scope import MZone
+from threading import Thread
 from time import sleep
+import sys
 import json_logging
 import logging
 import os
@@ -11,11 +13,15 @@ import json
 json_logging.ENABLE_JSON_LOGGING = True
 json_logging.init()
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-log_path = os.path.join('logs', 'mznotifier.log')
-logger.addHandler(logging.FileHandler(filename=log_path, mode='w'))
+logger.setLevel(logging.INFO)
+logging.StreamHandler(sys.stdout)
 config = Utils.read_config("package.json")
-env_cfg = config[os.environ["environment"]]
+
+if os.environ is None or "environment" not in os.environ:
+    env_cfg = config["dev"]
+else:
+    env_cfg = config[os.environ["environment"]]
+
 rabbitmq = env_cfg["RABBITMQ_URL"]
 
 if env_cfg["secrets"]:
@@ -31,11 +37,9 @@ else:
     rabbit_user = env_cfg["rabbitmq_user"]
     rabbit_pass = env_cfg["rabbitmq_passw"]
 
-m = MZone(mzone_user, mzone_pass, mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone61.api/")
 
-
-def get_subscriptions(template):
-    subs = m.get_subscriptions(extra="id eq "+template)["value"]
+def get_subscriptions(template, mz=None):
+    subs = mz.get_subscriptions(extra="id eq "+template)["value"]
     addresses = []
     for subj in subs:
         if subj["subscriber"]["phoneMobile"] not in addresses:
@@ -60,11 +64,11 @@ def send_to_rabbit(envelop):
                           body=json.dumps(envelop))
 
 
-def mark_read(messages):
+def mark_read(messages, mz):
     notifications = []
     for i in messages:
         notifications.append(i["id"])
-    status = m.set_notifications_read(notifications)
+    status = mz.set_notifications_read(notifications)
     if status.status_code == 200 or status.status_code == 204:
         logger.info("Notifications set read mark", extra={'props': {"notifications": messages,
                                                                     "app": config["name"], "label": config["name"]}})
@@ -73,7 +77,7 @@ def mark_read(messages):
                                                                     "app": config["name"], "label": config["name"]}})
 
 
-def build_message(messages, addresses):
+def build_message(messages, addresses, mz=None):
     mq = dict()
     envelops = []
     for message in messages:
@@ -88,13 +92,14 @@ def build_message(messages, addresses):
         logger.info("Posting message to RabbitMQ", extra={'props': {"message": json.dumps(mq), "app": config["name"],
                                                                     "label": config["name"]}})
         send_to_rabbit(mq)
-        mark_read(messages)
+        mark_read(messages, mz)
     else:
         logger.info("There is nothing to send to RabbitMQ", extra={'props': {"app": config["name"],
                                                                              "label": config["name"]}})
 
 
-def start():
+def start(account):
+    m = MZone(account["user"], account["pass"], mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone61.api/")
     notifis = m.get_notifications(extra="readUtcTimestamp eq null")["value"]
     logger.info("Reading notifications", extra={'props': {"notifications": notifis,
                                                           "app": config["name"], "label": config["name"]}})
@@ -112,17 +117,31 @@ def start():
 
     for temple in templates:
         address = dict()
-        address["phones"] = get_subscriptions(temple)
+        address["phones"] = get_subscriptions(temple, m)
         address["template"] = temple
         addresses.append(address)
 
-    build_message(messages, addresses)
+    build_message(messages, addresses, m)
+
+
+def get_accounts():
+    accounts = []
+    i = 0
+    for user in env_cfg["mzone_users"]:
+        account = dict()
+        account["user"] = user
+        account["pass"] = env_cfg["mzone_passwords"][i]
+        accounts.append(account)
+        i = i + 1
+    return accounts
 
 
 def main():
-    print(Utils.print_title("package.json"))
+    accounts = get_accounts()
     while True:
-        start()
+        for account in accounts:
+            thread = Thread(target=start, args=(account,))
+            thread.start()
         sleep(120)
 
 
