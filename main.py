@@ -14,7 +14,7 @@ json_logging.ENABLE_JSON_LOGGING = True
 json_logging.init()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-logging.StreamHandler(sys.stdout)
+logger.addHandler(logging.StreamHandler(sys.stdout))
 config = Utils.read_config("package.json")
 
 if os.environ is None or "environment" not in os.environ:
