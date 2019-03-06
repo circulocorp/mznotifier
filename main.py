@@ -1,5 +1,6 @@
 from PydoNovosoft.utils import Utils
 from PydoNovosoft.scope import MZone
+from datetime import datetime, timedelta
 from threading import Thread
 from time import sleep
 import sys
@@ -99,8 +100,9 @@ def build_message(messages, addresses, mz=None):
 
 
 def start(account):
+    yesterday = Utils.format_date(datetime.now() - timedelta(days=3), "%Y-%m-%dT%H:%M:%S")
     m = MZone(account["user"], account["pass"], mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone61.api/")
-    notifis = m.get_notifications(extra="readUtcTimestamp eq null")["value"]
+    notifis = m.get_notifications(extra="readUtcTimestamp eq null and utcTimestamp gt "+yesterday+"Z")["value"]
     logger.info("Reading notifications", extra={'props': {"notifications": notifis,
                                                           "app": config["name"], "label": config["name"]}})
     templates = []
