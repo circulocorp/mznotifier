@@ -100,11 +100,15 @@ def build_message(messages, addresses, mz=None):
 
 
 def start(account):
-    yesterday = Utils.format_date(datetime.now() - timedelta(days=3), "%Y-%m-%dT%H:%M:%S")
+    logger.info("Searching notifications for "+account["user"], extra={'props': {"app": config["name"], "label": config["name"]}})
+    yesterday = Utils.format_date(datetime.now() - timedelta(hours=12), "%Y-%m-%dT%H:%M:%S")
     m = MZone(account["user"], account["pass"], mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone61.api/")
     notifis = m.get_notifications(extra="readUtcTimestamp eq null and utcTimestamp gt "+yesterday+"Z")["value"]
-    logger.info("Reading notifications", extra={'props': {"notifications": notifis,
-                                                          "app": config["name"], "label": config["name"]}})
+    if len(notifis) > 0:
+        logger.info("Reading notifications", extra={'props': {"notifications": notifis, "app": config["name"], "label": config["name"]}})
+    else:
+        logger.info("No notifications found for "+account["user"],
+                    extra={'props': {"app": config["name"], "label": config["name"]}})
     templates = []
     messages = []
     addresses = []
@@ -144,7 +148,7 @@ def main():
         for account in accounts:
             thread = Thread(target=start, args=(account,))
             thread.start()
-        sleep(120)
+        sleep(300)
 
 
 if __name__ == '__main__':
