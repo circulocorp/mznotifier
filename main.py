@@ -168,8 +168,8 @@ def get_accounts():
 
 
 def main():
-    accounts = get_accounts()
     while True:
+        accounts = get_accounts()
         for account in accounts:
             thread = Thread(target=start, args=(account,))
             thread.start()
