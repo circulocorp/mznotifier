@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 PydoNovosoft==1.1.6
 pika==0.12.0
+=======
+PydoNovosoft==1.1.7.2
+pika
+>>>>>>> 5ebe5126fd4c519aeef90bc7717b9d9fee3870aa
 suds
 requests
 json_logging
