@@ -45,11 +45,14 @@ else:
 
 
 def get_subscriptions(template, mz=None):
-    subs = mz.get_subscriptions(extra="id eq "+template)["value"]
+    subs = mz.get_subscriptions(extra="id eq "+template)
     addresses = []
-    for subj in subs:
-        if subj["subscriber"]["phoneMobile"] not in addresses:
-            addresses.append(subj["subscriber"]["phoneMobile"])
+    if "value" in subs:
+        for subj in subs:
+            if subj["subscriber"]["phoneMobile"] not in addresses:
+                addresses.append(subj["subscriber"]["phoneMobile"])
+    else:
+        logger.error(subs.text, extra={'props': {"app": config["name"], "label": config["name"]}})
     return addresses
 
 
