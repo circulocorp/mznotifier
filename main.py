@@ -83,7 +83,8 @@ def mark_read(messages, mz):
                                                                     "app": config["name"], "label": config["name"]}})
     else:
         logger.error("Problem setting read mark", extra={'props': {"notifications": messages,
-                                                                    "app": config["name"], "label": config["name"]}})
+                                                                    "app": config["name"], "label": config["name"],
+                                                                   "error": status.text}})
 
 
 def build_message(messages, addresses, mz=None, extras=""):
