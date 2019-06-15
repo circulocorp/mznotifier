@@ -187,7 +187,7 @@ def main():
         for account in accounts:
             thread = Thread(target=start, args=(account,))
             thread.start()
-        sleep(6000)
+        sleep(600)
 
 
 if __name__ == '__main__':
