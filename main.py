@@ -45,14 +45,18 @@ else:
 
 
 def get_subscriptions(template, mz=None):
-    subs = mz.get_subscriptions(extra="id eq "+template)
     addresses = []
-    if "value" in subs:
-        for subj in subs:
-            if subj["subscriber"]["phoneMobile"] not in addresses:
-                addresses.append(subj["subscriber"]["phoneMobile"])
-    else:
-        logger.error(subs.text, extra={'props': {"app": config["name"], "label": config["name"]}})
+    try:
+        subs = mz.get_subscriptions(extra="id eq "+template)
+        if "value" in subs:
+            for subj in subs:
+                if subj["subscriber"]["phoneMobile"] not in addresses:
+                    addresses.append(subj["subscriber"]["phoneMobile"])
+        else:
+            logger.error(subs.text, extra={'props': {"app": config["name"], "label": config["name"]}})
+    except:
+        logger.warning("Cant retrive phone subscriptions", extra={'props': {"app": config["name"],
+                                                                            "label": config["name"]}})
     return addresses
 
 
@@ -123,32 +127,36 @@ def start(account):
                                                                                  "label": config["name"]}})
     yesterday = Utils.format_date(datetime.now() - timedelta(hours=12), "%Y-%m-%dT%H:%M:%S")
     m = MZone(account["user"], account["password"], mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone61.api/")
-    notifis = m.get_notifications(extra="readUtcTimestamp eq null and utcTimestamp gt "+yesterday+"Z")["value"]
-    if len(notifis) > 0:
-        logger.info("Reading notifications", extra={'props': {"notifications": notifis,
-                                                              "app": config["name"], "label": config["name"]}})
+    if m.check_token():
+        notifis = m.get_notifications(extra="readUtcTimestamp eq null and utcTimestamp gt "+yesterday+"Z")["value"]
+        if len(notifis) > 0:
+            logger.info("Reading notifications", extra={'props': {"notifications": notifis,
+                                                                  "app": config["name"], "label": config["name"]}})
+        else:
+            logger.info("No notifications found for "+account["user"],
+                        extra={'props': {"app": config["name"], "label": config["name"]}})
+        templates = []
+        messages = []
+        addresses = []
+        for noti in notifis:
+            if noti["notificationTemplate_Id"] not in templates:
+                templates.append(noti["notificationTemplate_Id"])
+            message = dict()
+            message["template"] = noti["notificationTemplate_Id"]
+            message["text"] = noti["message"]
+            message["id"] = noti["id"]
+            messages.append(message)
+
+        for temple in templates:
+            address = dict()
+            address["phones"] = get_subscriptions(temple, m)
+            address["template"] = temple
+            addresses.append(address)
+
+        build_message(messages, addresses, m, account)
     else:
-        logger.info("No notifications found for "+account["user"],
-                    extra={'props': {"app": config["name"], "label": config["name"]}})
-    templates = []
-    messages = []
-    addresses = []
-    for noti in notifis:
-        if noti["notificationTemplate_Id"] not in templates:
-            templates.append(noti["notificationTemplate_Id"])
-        message = dict()
-        message["template"] = noti["notificationTemplate_Id"]
-        message["text"] = noti["message"]
-        message["id"] = noti["id"]
-        messages.append(message)
-
-    for temple in templates:
-        address = dict()
-        address["phones"] = get_subscriptions(temple, m)
-        address["template"] = temple
-        addresses.append(address)
-
-    build_message(messages, addresses, m, account)
+        logger.error("Cant connect to MZone using "+account["user"], extra={'props': {"account": account["user"],
+                                                                  "app": config["name"], "label": config["name"]}})
 
 
 # def get_accounts():
