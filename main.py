@@ -66,15 +66,20 @@ def address_helper(addresses, token):
             return address
 
 
-def send_to_rabbit(envelop):
-    logger.info("Posting data to RabbitMQ", extra={'props': {"app": config["name"], "label": config["name"]}})
-    credentials = pika.PlainCredentials(rabbit_user, rabbit_pass)
-    parameters = pika.ConnectionParameters(rabbitmq, 5672, '/', credentials)
-    connection = pika.BlockingConnection(parameters)
-    channel = connection.channel()
-    channel.exchange_declare(exchange='circulocorp', exchange_type='direct', durable=True)
-    channel.basic_publish(exchange='circulocorp', routing_key='notificaciones',
-                          body=json.dumps(envelop))
+def send_to_rabbit(envelop, account):
+    logger.info("Posting data to RabbitMQ "+account["user"], extra={'props': {"app": config["name"],
+                                                                              "label": config["name"]}})
+    try:
+        credentials = pika.PlainCredentials(rabbit_user, rabbit_pass)
+        parameters = pika.ConnectionParameters(rabbitmq, 5672, '/', credentials)
+        connection = pika.BlockingConnection(parameters)
+        channel = connection.channel()
+        channel.exchange_declare(exchange='circulocorp', exchange_type='direct', durable=True)
+        channel.basic_publish(exchange='circulocorp', routing_key='notificaciones',
+                              body=json.dumps(envelop))
+    except:
+        logger.error("Cant publish to rabbitmq " + account["user"],
+                     extra={'props': {"app": config["name"], "label": config["name"]}})
 
 
 def mark_read(messages, mz, account):
@@ -90,6 +95,7 @@ def mark_read(messages, mz, account):
         logger.error("Problem setting read mark "+account["user"], extra={'props': {"notifications": messages,
                                                                     "app": config["name"], "label": config["name"],
                                                                    "error": status.text}})
+    return 0
 
 
 def build_message(messages, addresses, mz=None, account={}):
@@ -115,7 +121,7 @@ def build_message(messages, addresses, mz=None, account={}):
         mq["data"] = envelops
         logger.info("Posting message to RabbitMQ", extra={'props': {"message": json.dumps(mq), "app": config["name"],
                                                                     "label": config["name"]}})
-        send_to_rabbit(mq)
+        send_to_rabbit(mq, account)
         mark_read(messages, mz, account)
     else:
         logger.info("There is nothing to send to RabbitMQ for "+account["user"], extra={'props': {"app": config["name"],
@@ -159,24 +165,12 @@ def start(account):
         logger.error("Cant connect to MZone using "+account["user"], extra={'props': {"account": account["user"],
                                                                   "app": config["name"], "label": config["name"]}})
 
-
-# def get_accounts():
-#     accounts = []
-#     i = 0
-#     for user in env_cfg["mzone_users"]:
-#         account = dict()
-#         account["user"] = user
-#         account["pass"] = env_cfg["mzone_passwords"][i]
-#         accounts.append(account)
-#         i = i + 1
-#     return accounts
-
-
 def get_accounts():
     response = requests.get(url+"/api/notificationadmins", auth=HTTPBasicAuth('circulocorp', api_pass))
     if response.status_code == 200:
         data = response.json()
     else:
+        logger.error("Cant get accounts information", extra={'props': {"app": config["name"], "label": config["name"]}})
         data = None
     return data
 
@@ -187,7 +181,7 @@ def main():
         for account in accounts:
             thread = Thread(target=start, args=(account,))
             thread.start()
-        sleep(600)
+        sleep(300)
 
 
 if __name__ == '__main__':
