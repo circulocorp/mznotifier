@@ -127,6 +127,7 @@ def start(account):
                                                                                  "label": config["name"]}})
     yesterday = Utils.format_date(datetime.now() - timedelta(hours=12), "%Y-%m-%dT%H:%M:%S")
     m = MZone(account["user"], account["password"], mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone61.api/")
+    m.gettoken()
     if m.check_token():
         notifis = m.get_notifications(extra="readUtcTimestamp eq null and utcTimestamp gt "+yesterday+"Z")["value"]
         if len(notifis) > 0:
