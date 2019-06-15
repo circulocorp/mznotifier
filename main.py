@@ -73,26 +73,27 @@ def send_to_rabbit(envelop):
                           body=json.dumps(envelop))
 
 
-def mark_read(messages, mz):
+def mark_read(messages, mz, account):
     notifications = []
     for i in messages:
         notifications.append(i["id"])
+    mz = MZone(account["user"], account["password"], mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone61.api/")
     status = mz.set_notifications_read(notifications)
     if status.status_code == 200 or status.status_code == 204:
         logger.info("Notifications set read mark", extra={'props': {"notifications": messages,
                                                                     "app": config["name"], "label": config["name"]}})
     else:
-        logger.error("Problem setting read mark", extra={'props': {"notifications": messages,
+        logger.error("Problem setting read mark "+account["user"], extra={'props': {"notifications": messages,
                                                                     "app": config["name"], "label": config["name"],
                                                                    "error": status.text}})
 
 
-def build_message(messages, addresses, mz=None, extras=""):
+def build_message(messages, addresses, mz=None, account={}):
     mq = dict()
     envelops = []
     extra_subscribers = []
-    if extras:
-        extra_subscribers = extras.split(",")
+    if "extraSubscribers" in account:
+        extra_subscribers = account["extraSubscribers"].split(",")
     for message in messages:
         for phone in address_helper(addresses, message["template"])["phones"]:
             enve = dict()
@@ -111,9 +112,9 @@ def build_message(messages, addresses, mz=None, extras=""):
         logger.info("Posting message to RabbitMQ", extra={'props': {"message": json.dumps(mq), "app": config["name"],
                                                                     "label": config["name"]}})
         send_to_rabbit(mq)
-        mark_read(messages, mz)
+        mark_read(messages, mz, account)
     else:
-        logger.info("There is nothing to send to RabbitMQ", extra={'props': {"app": config["name"],
+        logger.info("There is nothing to send to RabbitMQ for "+account["user"], extra={'props': {"app": config["name"],
                                                                              "label": config["name"]}})
 
 
@@ -147,7 +148,7 @@ def start(account):
         address["template"] = temple
         addresses.append(address)
 
-    build_message(messages, addresses, m, account["extraSubscribers"])
+    build_message(messages, addresses, m, account)
 
 
 # def get_accounts():
@@ -177,7 +178,7 @@ def main():
         for account in accounts:
             thread = Thread(target=start, args=(account,))
             thread.start()
-        sleep(300)
+        sleep(6000)
 
 
 if __name__ == '__main__':
