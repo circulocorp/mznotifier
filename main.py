@@ -49,7 +49,7 @@ def get_subscriptions(template, mz=None):
     try:
         subs = mz.get_subscriptions(extra="id eq "+template)
         if "value" in subs:
-            for subj in subs:
+            for subj in subs["value"]:
                 if subj["subscriber"]["phoneMobile"] not in addresses:
                     addresses.append(subj["subscriber"]["phoneMobile"])
         else:
