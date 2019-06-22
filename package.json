@@ -1,6 +1,6 @@
 {
 	"name": "mznotifier",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "MZone SMS notifications",
 	"author": "Mauricio Barrera",
 	"queue": "notificaciones",
