@@ -1,4 +1,4 @@
-FROM python:2.7.15-alpine
+FROM python
 COPY . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
