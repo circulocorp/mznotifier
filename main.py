@@ -86,7 +86,7 @@ def mark_read(messages, mz, account):
     notifications = []
     for i in messages:
         notifications.append(i["id"])
-    mz = MZone(account["user"], account["password"], mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone61.api/")
+    mz = MZone(account["user"], account["password"], mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone62.api/")
     status = mz.set_notifications_read(notifications)
     if status.status_code == 200 or status.status_code == 204:
         logger.info("Notifications set read mark", extra={'props': {"notifications": messages,
@@ -132,7 +132,7 @@ def start(account):
     logger.info("Searching notifications for "+account["user"], extra={'props': {"app": config["name"],
                                                                                  "label": config["name"]}})
     yesterday = Utils.format_date(datetime.now() - timedelta(hours=12), "%Y-%m-%dT%H:%M:%S")
-    m = MZone(account["user"], account["password"], mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone61.api/")
+    m = MZone(account["user"], account["password"], mzone_secret, "mz-a3tek", "https://live.mzoneweb.net/mzone62.api/")
     m.gettoken()
     if m.check_token():
         notifis = m.get_notifications(extra="readUtcTimestamp eq null and utcTimestamp gt "+yesterday+"Z")["value"]
