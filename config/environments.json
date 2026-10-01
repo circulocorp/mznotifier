@@ -1,0 +1,23 @@
+{
+  "defaults": {
+    "RABBITMQ_HOST": "10.0.4.100",
+    "RABBITMQ_PORT": 5672,
+    "RABBITMQ_VHOST": "/",
+    "RABBITMQ_EXCHANGE": "circulocorp",
+    "RABBITMQ_ROUTING_KEY": "notificaciones",
+    "API_USER": "circulocorp",
+    "MZONE_API_URL": "https://live.mzoneweb.net/mzone62.api/",
+    "MZONE_TOKEN_URL": "https://login.mzoneweb.net/connect/token",
+    "MZONE_CLIENT_ID": "mz-a3tek",
+    "MZONE_SCOPE": "openid mz6-api.all mz_username",
+    "POLL_INTERVAL_SECONDS": 120,
+    "LOOKBACK_HOURS": 12,
+    "HTTP_TIMEOUT_SECONDS": 30,
+    "DRY_RUN": false
+  },
+  "dev": {},
+  "stage": {},
+  "prod": {
+    "API_URL": "http://10.0.4.188:8080"
+  }
+}

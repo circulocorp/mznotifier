@@ -1,4 +1,7 @@
-.idea
-.pyc
-.log
-venv
+node_modules/
+legacy/
+inbox/
+.env
+.idea/
+*.log
+.DS_Store

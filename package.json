@@ -1,22 +1,16 @@
 {
-	"name": "mznotifier",
-	"version": "1.0.5",
-	"description": "MZone SMS notifications",
-	"author": "Mauricio Barrera",
-	"queue": "notificaciones",
-	"dev": {
-        "RABBITMQ_URL": "10.0.4.100",
-		"secrets": false
-    },
-    "stage": {
-        "RABBITMQ_URL": "10.0.4.100",
-        "mzone_users": ["Julioc"],
-        "mzone_passwords": ["Jc061978"],
-		"secrets": true
-    },
-	"prod": {
-        "RABBITMQ_URL": "10.0.4.100",
-		"secrets": true,
-        "API_URL": "http://10.0.4.188:8080"
-    }
+  "name": "mznotifier",
+  "version": "2.0.0",
+  "description": "MZone SMS notifications",
+  "private": true,
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.4"
+  }
 }
