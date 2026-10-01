@@ -11,8 +11,10 @@ phases:
   pre_build:
     commands:
       - REGISTRY=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - aws --version; docker version --format 'Docker {{.Server.Version}}'
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REGISTRY
+      # get-authorization-token existe en AWS CLI v1 y v2 (get-login-password no está en v1 antiguas).
+      - aws ecr get-authorization-token --region $AWS_DEFAULT_REGION --query 'authorizationData[0].authorizationToken' --output text | base64 -d | cut -d':' -f2 | docker login --username AWS --password-stdin $REGISTRY
   build:
     commands:
       - echo Build version $VERSION started on `date`
