@@ -1,4 +1,6 @@
-FROM ubuntu:24.04
+# ubuntu:20.04 (glibc 2.31): los nodos del swarm usan Docker < 20.10.10, cuyo seccomp bloquea
+# clone3; con glibc >= 2.34 (ubuntu 22.04+) Node no puede crear hilos y aborta al arrancar.
+FROM ubuntu:20.04
 
 ARG NODE_MAJOR=24
 RUN apt-get update \
@@ -17,5 +19,6 @@ COPY config ./config
 COPY src ./src
 
 ENV NODE_ENV=production
-USER ubuntu
+RUN useradd --system --no-create-home --shell /usr/sbin/nologin mznotifier
+USER mznotifier
 CMD ["node", "src/index.js"]

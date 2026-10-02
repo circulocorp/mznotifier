@@ -36,7 +36,7 @@ cp .env.example .env   # llenar valores
 node --env-file=.env src/index.js
 ```
 
-Docker (base `ubuntu:24.04`, Node 24):
+Docker (base `ubuntu:20.04`, Node 24):
 
 ```sh
 docker build -t mznotifier .
