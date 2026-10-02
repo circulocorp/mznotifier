@@ -1,6 +1,9 @@
-*.pyc
-__pycache__
+node_modules
+legacy
+inbox
+.git
+.env
 *.log
-venv
 Dockerfile
 buildspec.yml
+README.md
