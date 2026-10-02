@@ -120,12 +120,14 @@ async function runCycle() {
     return;
   }
 
+  const started = Date.now();
   const results = await Promise.allSettled(accounts.map(processAccount));
   results.forEach((result, i) => {
     if (result.status === 'rejected') {
       logger.error('Error processing account ' + accounts[i].user, { error: result.reason.message });
     }
   });
+  logger.info('Cycle finished', { accounts: accounts.length, durationMs: Date.now() - started });
 }
 
 async function main() {
