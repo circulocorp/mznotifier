@@ -1,7 +1,7 @@
 # mznotifier
 MZone notifier SMS service
 
-Cada `POLL_INTERVAL_SECONDS` (120 s) consulta las cuentas en `{API_URL}/api/notificationadmins`, lee las
+Cada `POLL_INTERVAL_SECONDS` (60 s) consulta las cuentas en `{API_URL}/api/notificationadmins`, lee las
 notificaciones no leídas de MZone de las últimas `LOOKBACK_HOURS` (12 h), publica los SMS en RabbitMQ
 (exchange `circulocorp`, routing key `notificaciones`, formato `{"data":[{"message","address"}]}`) y,
 solo si el broker confirmó la publicación, las marca como leídas en MZone.
