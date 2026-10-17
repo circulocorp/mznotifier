@@ -10,7 +10,7 @@
     "MZONE_TOKEN_URL": "https://login.mzoneweb.net/connect/token",
     "MZONE_CLIENT_ID": "mz-a3tek",
     "MZONE_SCOPE": "openid mz6-api.all mz_username",
-    "POLL_INTERVAL_SECONDS": 120,
+    "POLL_INTERVAL_SECONDS": 60,
     "LOOKBACK_HOURS": 12,
     "HTTP_TIMEOUT_SECONDS": 30,
     "DRY_RUN": false
